@@ -1,4 +1,6 @@
-<?php $this->load->view("partial/header"); ?>
+<?php 
+	$this->load->view("partial/header");
+?>
 
 <div id="page_title"><?php echo $title ?></div>
 
@@ -13,13 +15,33 @@
 	foreach($summary_data as $name=>$value)
 	{
 	?>
-		<div class="summary_row"><?php echo $this->lang->line('reports_'.$name). ': '.to_currency($value); ?></div>
+		<div class="summary_row">
+		<?php echo $this->lang->line('reports_'.$name). ': '.to_currency($value)."<br>"; ?>
+		<?php 
+	$tyy = "";
+	$pos = strpos($name, 'profit');
+
+	if ($pos !== false) {
+		foreach ($expense_sum as $row) { 
+			if ($row>0) {
+				$tyy= $row['amount'];
+			}
+		}?>
+		
+	
+	<?php echo to_currency($tyy); ?> 
+		<?php $profit =(int)$value - (int)$tyy;?>
+    		<?php echo "Profit After Expense"; ?> <br>
+        		<?php echo to_currency($profit); ?>
+        		
+	<?php } ?>
+		</div>
 	<?php
 	}
 	?>
 </div>
 
-<script type="text/javascript">
+<script type="text/javascript" language="javascript">
 	$(document).ready(function()
 	{
 		<?php $this->load->view('partial/bootstrap_tables_locale'); ?>
@@ -35,11 +57,11 @@
 			showExport: true,
 			data: <?php echo json_encode($data); ?>,
 			iconSize: 'sm',
-			paginationVAlign: 'bottom',
-			escape: false
+			paginationVAlign: 'bottom'
 		});
 
 	});
 </script>
-
-<?php $this->load->view("partial/footer"); ?>
+<?php
+	$this->load->view("partial/footer");
+?>

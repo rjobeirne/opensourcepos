@@ -20,7 +20,7 @@ function get_sales_manage_table_headers()
 		$headers[] = array('invoice' => '&nbsp', 'sortable' => FALSE);
 	}
 
-	return transform_headers(array_merge($headers, array(array('receipt' => '&nbsp', 'sortable' => FALSE))));
+	return transform_headers(array_merge($headers, array(array( 'receipt' => '&nbsp', 'sortable' => FALSE ))));
 }
 
 /*
@@ -58,27 +58,26 @@ function get_sale_data_row($sale, $controller)
 	$row = array (
 		'sale_id' => $sale->sale_id,
 		'sale_time' => date( $CI->config->item('dateformat') . ' ' . $CI->config->item('timeformat'), strtotime($sale->sale_time) ),
-		'customer_name' => $sale->customer_name,
-		'amount_tendered' => to_currency($sale->amount_tendered),
+		'customer_name' => character_limiter( $sale->customer_name, 25),
+		'amount_tendered' => to_currency( $sale->amount_tendered ),
 		'amount_due' => to_currency($sale->amount_due),
 		'change_due' => to_currency($sale->change_due),
-		'payment_type' => $sale->payment_type
+		'payment_type' => $sale->payment_type,
+		'invoice_number' => $sale->invoice_number,
+		'receipt' => anchor($controller_name."/receipt/$sale->sale_id", '<span class="glyphicon glyphicon-print"></span>',
+			array('title'=>$CI->lang->line('sales_show_receipt'))
+		),
+		'edit' => anchor($controller_name."/edit/$sale->sale_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>"modal-dlg modal-btn-delete modal-btn-submit print_hide", 'title'=>$CI->lang->line($controller_name.'_update'))
+		)
 	);
 
-	if($CI->config->item('invoice_enable'))
+	if ($CI->config->item('invoice_enable'))
 	{
-		$row['invoice_number'] = $sale->invoice_number;
-		$row['invoice'] = empty($sale->invoice_number) ? '' : anchor($controller_name."/invoice/$sale->sale_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+		$row['invoice'] = anchor($controller_name."/invoice/$sale->sale_id", '<span class="glyphicon glyphicon-list-alt"></span>',
 			array('title'=>$CI->lang->line('sales_show_invoice'))
-		);
+		);		
 	}
-
-	$row['receipt'] = anchor($controller_name."/receipt/$sale->sale_id", '<span class="glyphicon glyphicon-usd"></span>',
-		array('title'=>$CI->lang->line('sales_show_receipt'))
-	);
-	$row['edit'] = anchor($controller_name."/edit/$sale->sale_id", '<span class="glyphicon glyphicon-edit"></span>',
-		array('class'=>"modal-dlg print_hide", 'data-btn-delete' => $CI->lang->line('common_delete'), 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
-	);
 
 	return $row;
 }
@@ -89,7 +88,7 @@ Get the sales payments summary
 function get_sales_manage_payments_summary($payments, $sales, $controller)
 {
 	$CI =& get_instance();
-	$table = '<div id="report_summary">';
+	$table='<div id="report_summary">';
 
 	foreach($payments as $key=>$payment)
 	{
@@ -104,9 +103,9 @@ function get_sales_manage_payments_summary($payments, $sales, $controller)
 				$amount -= $sale['change_due'];
 			}
 		}
-		$table .= '<div class="summary_row">' . $payment['payment_type'] . ': ' . to_currency( $amount ) . '</div>';
+		$table.='<div class="summary_row">'.$payment['payment_type'].': '.to_currency( $amount ) . '</div>';
 	}
-	$table .= '</div>';
+	$table.='</div>';
 
 	return $table;
 }
@@ -149,8 +148,8 @@ function get_people_manage_table_headers()
 
 	$headers = array(
 		array('people.person_id' => $CI->lang->line('common_id')),
-		array('last_name' => $CI->lang->line('common_last_name')),
 		array('first_name' => $CI->lang->line('common_first_name')),
+		array('last_name' => $CI->lang->line('common_last_name')),		
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number'))
 	);
@@ -170,14 +169,14 @@ function get_person_data_row($person, $controller)
 
 	return array (
 		'people.person_id' => $person->person_id,
-		'last_name' => $person->last_name,
-		'first_name' => $person->first_name,
-		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
-		'phone_number' => $person->phone_number,
+		'first_name' => character_limiter($person->first_name,13),
+		'last_name' => character_limiter($person->last_name,13),	
+		'email' => empty($person->email) ? '' : mailto($person->email,character_limiter($person->email,22)),
+		'phone_number' => character_limiter($person->phone_number,13),
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>', 
-			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line('messages_sms_send'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
 	));
 }
 
@@ -189,8 +188,8 @@ function get_suppliers_manage_table_headers()
 		array('people.person_id' => $CI->lang->line('common_id')),
 		array('company_name' => $CI->lang->line('suppliers_company_name')),
 		array('agency_name' => $CI->lang->line('suppliers_agency_name')),
-		array('last_name' => $CI->lang->line('common_last_name')),
 		array('first_name' => $CI->lang->line('common_first_name')),
+		array('last_name' => $CI->lang->line('common_last_name')),		
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number'))
 	);
@@ -210,17 +209,18 @@ function get_supplier_data_row($supplier, $controller)
 
 	return array (
 		'people.person_id' => $supplier->person_id,
-		'company_name' => $supplier->company_name,
-		'agency_name' => $supplier->agency_name,
-		'last_name' => $supplier->last_name,
-		'first_name' => $supplier->first_name,
-		'email' => empty($supplier->email) ? '' : mailto($supplier->email, $supplier->email),
-		'phone_number' => $supplier->phone_number,
+		'company_name' => character_limiter($supplier->company_name,13),
+		'agency_name' => character_limiter($supplier->agency_name,13),
+		'first_name' => character_limiter($supplier->first_name,13),
+		'last_name' => character_limiter($supplier->last_name,13),
+		
+		'email' => empty($supplier->email) ? '' : mailto($supplier->email,character_limiter($supplier->email,22)),
+		'phone_number' => character_limiter($supplier->phone_number,13),
 		'messages' => empty($supplier->phone_number) ? '' : anchor("Messages/view/$supplier->person_id", '<span class="glyphicon glyphicon-phone"></span>', 
-			array('class'=>"modal-dlg", 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line('messages_sms_send'))),
 		'edit' => anchor($controller_name."/view/$supplier->person_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class'=>"modal-dlg", 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update')))
-		);
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
+		));
 }
 
 function get_items_manage_table_headers()
@@ -231,12 +231,13 @@ function get_items_manage_table_headers()
 		array('items.item_id' => $CI->lang->line('common_id')),
 		array('item_number' => $CI->lang->line('items_item_number')),
 		array('name' => $CI->lang->line('items_name')),
+		array('generic_name' => $CI->lang->line('items_Generic_Name')),
 		array('category' => $CI->lang->line('items_category')),
 		array('company_name' => $CI->lang->line('suppliers_company_name')),
 		array('cost_price' => $CI->lang->line('items_cost_price')),
 		array('unit_price' => $CI->lang->line('items_unit_price')),
 		array('quantity' => $CI->lang->line('items_quantity')),
-		array('tax_percents' => $CI->lang->line('items_tax_percents'), 'sortable' => FALSE),
+		// array('tax_percents' => $CI->lang->line('items_tax_percents'), 'sortable' => FALSE),
 		array('item_pic' => $CI->lang->line('items_image'), 'sortable' => FALSE),
 		array('inventory' => ''),
 		array('stock' => '')
@@ -248,45 +249,48 @@ function get_items_manage_table_headers()
 function get_item_data_row($item, $controller)
 {
 	$CI =& get_instance();
-	$item_tax_info = $CI->Item_taxes->get_info($item->item_id);
+	$item_tax_info=$CI->Item_taxes->get_info($item->item_id);
 	$tax_percents = '';
 	foreach($item_tax_info as $tax_info)
 	{
-		$tax_percents .= to_tax_decimals($tax_info['percent']) . '%, ';
+		$tax_percents.=to_tax_decimals($tax_info['percent']) . '%, ';
 	}
 	// remove ', ' from last item
-	$tax_percents = substr($tax_percents, 0, -2);
-	$controller_name = strtolower(get_class($CI));
+	$tax_percents=substr($tax_percents, 0, -2);
+	$controller_name=strtolower(get_class($CI));
 
 	$image = '';
-	if ($item->pic_id != '')
+	if (!empty($item->pic_id))
 	{
-		$images = glob('./uploads/item_pics/' . $item->pic_id . '.*');
+		$images = glob("uploads/item_pics/" . $item->pic_id . ".*");
 		if (sizeof($images) > 0)
 		{
-			$image .= '<a class="rollover" href="'. base_url($images[0]) .'"><img src="'.site_url('items/pic_thumb/'.$item->pic_id).'"></a>';
+			$image .= '<a class="rollover" href="'. base_url($images[0]) .'">
+			<img src="'.site_url('items/pic_thumb/'.$item->pic_id).'">
+			</a>';
 		}
 	}
 
 	return array (
 		'items.item_id' => $item->item_id,
 		'item_number' => $item->item_number,
-		'name' => $item->name,
-		'category' => $item->category,
-		'company_name' => $item->company_name,
+		'name' => character_limiter($item->name,13),
+		'generic_name' => character_limiter($item->generic_name,13),
+		'category' => character_limiter($item->category,13),
+		'company_name' => character_limiter($item->company_name,20),
 		'cost_price' => to_currency($item->cost_price),
 		'unit_price' => to_currency($item->unit_price),
 		'quantity' => to_quantity_decimals($item->quantity),
-		'tax_percents' => !$tax_percents ? '-' : $tax_percents,
+		// 'tax_percents' => !$tax_percents ? '-' : $tax_percents,
 		'item_pic' => $image,
 		'inventory' => anchor($controller_name."/inventory/$item->item_id", '<span class="glyphicon glyphicon-pushpin"></span>',
-			array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_count'))
+			array('class' => "modal-dlg modal-btn-submit", 'title' => $CI->lang->line($controller_name.'_count'))
 		),
 		'stock' => anchor($controller_name."/count_details/$item->item_id", '<span class="glyphicon glyphicon-list-alt"></span>',
-			array('class' => 'modal-dlg', 'title' => $CI->lang->line($controller_name.'_details_count'))
+		array('class' => "modal-dlg", 'title' => $CI->lang->line($controller_name.'_details_count'))
 		),
 		'edit' => anchor($controller_name."/view/$item->item_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class' => 'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title' => $CI->lang->line($controller_name.'_update'))
+			array('class' => "modal-dlg modal-btn-submit", 'title' => $CI->lang->line($controller_name.'_update'))
 		));
 }
 
@@ -296,8 +300,8 @@ function get_giftcards_manage_table_headers()
 
 	$headers = array(
 		array('giftcard_id' => $CI->lang->line('common_id')),
-		array('last_name' => $CI->lang->line('common_last_name')),
 		array('first_name' => $CI->lang->line('common_first_name')),
+		array('last_name' => $CI->lang->line('common_last_name')),		
 		array('giftcard_number' => $CI->lang->line('giftcards_giftcard_number')),
 		array('value' => $CI->lang->line('giftcards_card_value'))
 	);
@@ -312,12 +316,13 @@ function get_giftcard_data_row($giftcard, $controller)
 
 	return array (
 		'giftcard_id' => $giftcard->giftcard_id,
-		'last_name' => $giftcard->last_name,
-		'first_name' => $giftcard->first_name,
+		'first_name' => character_limiter($giftcard->first_name,13),
+		'last_name' => character_limiter($giftcard->last_name,13),
+		
 		'giftcard_number' => $giftcard->giftcard_number,
 		'value' => to_currency($giftcard->value),
 		'edit' => anchor($controller_name."/view/$giftcard->giftcard_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
 		));
 }
 
@@ -343,13 +348,123 @@ function get_item_kit_data_row($item_kit, $controller)
 
 	return array (
 		'item_kit_id' => $item_kit->item_kit_id,
-		'name' => $item_kit->name,
-		'description' => $item_kit->description,
+		'name' => character_limiter($item_kit->name),
+		'description' => character_limiter($item_kit->description,13),
 		'cost_price' => to_currency($item_kit->total_cost_price),
 		'unit_price' => to_currency($item_kit->total_unit_price),
 		'edit' => anchor($controller_name."/view/$item_kit->item_kit_id", '<span class="glyphicon glyphicon-edit"></span>',
-			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
 		));
 }
+
+function get_expense_category_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('expense_category_id' => $CI->lang->line('expenses_categories_category_id')),
+		array('category_name' => $CI->lang->line('expenses_categories_name')),
+		array('description' => $CI->lang->line('expenses_categories_description'))
+	);
+
+	return transform_headers($headers);
+}
+
+function get_expense_category_data_row($expense_category, $controller)
+{
+	$CI =& get_instance();
+	$controller_name=strtolower(get_class($CI));
+
+	return array (
+		'expense_category_id' => $expense_category->expense_category_id,
+		'category_name' => character_limiter($expense_category->category_name),
+		'description' => character_limiter($expense_category->description,13),
+		'edit' => anchor($controller_name."/view/$expense_category->expense_category_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
+		));
+}
+
+function get_expenses_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('expense_id' => $CI->lang->line('expenses_expense_id')),
+		array('date' => $CI->lang->line('expenses_date')),
+		array('amount' => $CI->lang->line('expenses_amount')),
+		array('category_name' => $CI->lang->line('expenses_categories_name')),
+		array('description' => $CI->lang->line('expenses_description')),
+		array('createdBy' => $CI->lang->line('expenses_employee'))
+		
+	);
+
+	return transform_headers($headers);
+}
+
+
+function get_expenses_data_row($expense, $controller)
+{
+	$CI =& get_instance();
+	$controller_name=strtolower(get_class($CI));
+
+	return array (
+		'expense_id' => $expense->expense_id,
+		'date' => date( $CI->config->item('dateformat') . ' , ' . $CI->config->item('timeformat'), strtotime($expense->date) ),
+		'amount' => to_currency( $expense->amount ),
+		'category_name' => character_limiter( $expense->category_name, 25),
+		'description' => character_limiter($expense->description,13),
+	'createdBy' => character_limiter($expense->first_name.' '. $expense->last_name, 25),
+		'edit' => anchor($controller_name."/view/$expense->expense_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>"modal-dlg modal-btn-submit", 'title'=>$CI->lang->line($controller_name.'_update'))
+		));
+}
+
+
+/*
+ Gets the html data rows for the sales.
+ */
+function get_expenses_data_last_row($expenses, $controller)
+{
+	$CI =& get_instance();
+	$table_data_rows = '';
+	$sum_amount_expense = 0;
+
+	foreach($sales->result() as $key=>$sale)
+	{
+		$sum_amount_tendered += $sale->amount_tendered;
+		$sum_amount_due += $sale->amount_due;
+		$sum_change_due += $sale->change_due;
+	}
+
+	return array(
+		'expense_id' => '-',
+		'date' => '<b>'.$CI->lang->line('sales_total').'</b>',
+		'amount' => '<b>'. to_currency($sum_amount_expense).'</b>'
+		
+	);
+}
+
+
+/*
+Get the expenses payments summary
+*/
+function get_expenses_manage_payments_summary($payments, $expenses, $controller)
+{
+$CI =& get_instance();
+	$table='<div id="report_summary">';
+
+	foreach($payments as $key=>$payment)
+	{
+		$amount = $payment['amount'];
+
+		
+		$table.='<div class="summary_row">'.$payment['amount'].': '.to_currency( $amount ) . '</div>';
+	}
+	$table.='</div>';
+
+	return $table;
+}
+
+
 
 ?>

@@ -1,5 +1,11 @@
 <?php 
+//Expenses report
+$lang["reports_expense_categories"] = "Expenses";
+$lang["reports_expense_categories_summary_report"] = "Expense Categories Summary Report";
+$lang["reports_expense_category"] = "Expenses";
 
+
+$lang["reports_expense_amount"] = "Amount";
 $lang["reports_all"] = "All";
 $lang["reports_categories"] = "Categories";
 $lang["reports_categories_summary_report"] = "Categories Summary Report";
@@ -28,10 +34,11 @@ $lang["reports_inventory"] = "Inventory";
 $lang["reports_inventory_low"] = "Low Inventory";
 $lang["reports_inventory_low_report"] = "Low Inventory Report";
 $lang["reports_inventory_reports"] = "Inventory Reports";
-$lang["reports_inventory_summary"] = "Inventory Summary";
+$lang["reports_inventory_summary"] = " Inventory Summary";
 $lang["reports_inventory_summary_report"] = "Inventory Summary Report";
 $lang["reports_item"] = "Item";
 $lang["reports_item_name"] = "Item Name";
+$lang["reports_generic_name"] = "Generic Name";
 $lang["reports_item_number"] = "Item Number";
 $lang["reports_items"] = "Items";
 $lang["reports_items_purchased"] = "Items Purchased";
@@ -95,3 +102,10 @@ $lang["reports_total_inventory_value"] = "Total Inventory Value";
 $lang["reports_zero_and_less"] = "Zero and less";
 $lang["reports_more_than_zero"] = "More than zero";
 $lang["reports_no_reports_to_display"] = "No Items to display";
+$lang["reports_cashups"] = "Cashup Report";
+$lang["reports_cashups_cashup_id"] = "Cashup id";
+$lang["reports_declared_value"] = "Declared Total";
+$lang["reports_date_range"] = "Date Range";
+$lang["reports_payments_by_employee_summary_report"] = "Detailed payments received by employee";
+$lang["reports_reported_value"] = "Reported Total";
+$lang["reports_variance"] = "Variance";
