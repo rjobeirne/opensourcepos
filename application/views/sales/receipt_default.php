@@ -102,6 +102,10 @@
 			}
 			?>
 		<?php
+			if($item['stock_type'] == 0)    //Added to check for any computer purchases -rjob
+			{
+			$comp_check=1;
+			}
 		}
 		?>
 
@@ -194,13 +198,32 @@
 			<td class="total-value"><?php echo to_currency($amount_change); ?></td>
 		</tr>
 	</table>
+	
+	<style>
+	@media screen { .noscreen { display: none; align-self: center;} }
+	</style>
 
-	<div id="sale_return_policy">
-		<?php echo nl2br($this->config->item('return_policy')); ?>
+	<p class="pwords noscreen" style="position:absolute; bottom:0">
+		<?php
+			if($comp_check == 1){   //if any purchases are computers, print passwords
+			echo '<iframe src="passwords.html"  width="110%" scrolling="no"></iframe>';
+			echo '<br />';
+			echo nl2br($this->config->item('return_policy'));
+
+			} else { //not a computer
+			echo 'Thank you for supporting Computerbank';
+			} 
+		?>
+	</p> 
+
+	<div style="page-break-after: always;"></div>
+	<div class="page2 noscreen" style="align-content:center"> 
+		<?php
+			if($comp_check == 1) 
+			{ //if any purchases are computers, print back page
+			echo '<iframe src="https://docs.google.com/document/d/e/2PACX-1vTP5AZ1BVBGMpsB2J1bulYhVUtHS70bMxXBBzN5BM2SuHKCVMjeWpLhAZ2w8sxJ5yWAqTUIBNwqYHGp/pub?embedded=true" height="1100px" width="950px" scrolling="no" style="border:none;"></iframe>';
+			}
+		?>
 	</div>
 
-	<div id="barcode">
-		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
-		<?php echo $sale_id; ?>
-	</div>
 </div>
